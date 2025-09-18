@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
-import { Search, Sparkles, MessageSquare, FileText, Brain, ExternalLink } from 'lucide-react';
+import { Search, Sparkles, MessageSquare, FileText, Brain, Settings } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { ThemeToggle } from '@/components/ui/theme-toggle';
+import { ExportDropdown } from '@/components/ExportDropdown';
 import { SearchResults } from './SearchResults';
 import { ChatInterface } from './ChatInterface';
 import { ResearchPanel } from './ResearchPanel';
@@ -136,6 +138,25 @@ export function SearchEngine() {
     }));
   };
 
+  const generateSummary = (searchQuery: string, searchResults: SearchResult[]): string => {
+    const lowerQuery = searchQuery.toLowerCase();
+    
+    if (lowerQuery.includes('künstliche intelligenz') || lowerQuery.includes('ki')) {
+      return `Die Analyse der Suchergebnisse zu "${searchQuery}" zeigt eine rasante Entwicklung im Bereich der künstlichen Intelligenz. Machine Learning Algorithmen revolutionieren nicht nur Suchmaschinen, sondern auch zahlreiche andere Anwendungsbereiche. Besonders bemerkenswert ist der Fortschritt bei neuronalen Netzen und Deep Learning-Technologien, die es Computern ermöglichen, komplexe Muster zu erkennen und menschenähnliche Entscheidungen zu treffen. Die gefundenen Quellen zeigen einheitlich, dass KI-gestützte Systeme zunehmend präzisere und kontextbewusste Ergebnisse liefern. Diese Entwicklung wird durch kontinuierliche Verbesserungen in der Datenverarbeitung und algorithimischen Ansätzen vorangetrieben.`;
+    }
+    
+    if (lowerQuery.includes('klimawandel') || lowerQuery.includes('klima')) {
+      return `Die Recherche zu "${searchQuery}" offenbart die Dringlichkeit und Komplexität der aktuellen Klimakrise. Wissenschaftliche Daten belegen eine beschleunigte Erwärmung der globalen Temperaturen sowie veränderte Wettermuster, die weitreichende Auswirkungen auf Ökosysteme und menschliche Gesellschaften haben. Innovative Technologien und nachhaltige Lösungsansätze gewinnen zunehmend an Bedeutung, wobei sowohl politische als auch technologische Maßnahmen erforderlich sind. Die analysierten Quellen zeigen einen wissenschaftlichen Konsens über die anthropogenen Ursachen des Klimawandels und betonen die Notwendigkeit sofortiger, koordinierter Maßnahmen. Gleichzeitig werden vielversprechende Entwicklungen in erneuerbaren Energien und Klimaschutztechnologien dokumentiert.`;
+    }
+    
+    if (lowerQuery.includes('blockchain') || lowerQuery.includes('kryptowährung')) {
+      return `Die Untersuchung von "${searchQuery}" verdeutlicht das transformative Potenzial der Blockchain-Technologie weit über Kryptowährungen hinaus. Diese dezentrale Ledger-Technologie verspricht revolutionäre Veränderungen in Finanzwesen, Datenmanagement und Vertrauensbildung zwischen Parteien. Besonders hervorzuheben sind die Vorteile in Bezug auf Transparenz, Sicherheit und Unveränderlichkeit von Transaktionen. Die gefundenen Quellen illustrieren vielfältige Anwendungsmöglichkeiten von Smart Contracts bis hin zu Supply Chain Management. Jedoch zeigen die Analysen auch Herausforderungen wie Skalierbarkeit, Energieverbrauch und regulatorische Unsicherheiten auf, die für die Massenadoption bewältigt werden müssen.`;
+    }
+    
+    // Generische Zusammenfassung für andere Themen
+    return `Basierend auf der umfassenden Analyse zu "${searchQuery}" zeigen die gefundenen Quellen ein vielschichtiges Bild des Themas mit sowohl aktuellen Entwicklungen als auch zukunftsweisenden Perspektiven. Die Forschung in diesem Bereich entwickelt sich kontinuierlich weiter, wobei praktische Anwendungen zunehmend in den Fokus rücken. Expertenmeinungen aus verschiedenen Fachbereichen konvergieren zu dem Schluss, dass signifikante Veränderungen und Innovationen zu erwarten sind. Die analysierten Materialien zeigen sowohl Chancen als auch Herausforderungen auf, die eine ausgewogene und durchdachte Herangehensweise erfordern. Besonders bemerkenswert ist die Interdisziplinarität des Themas, die verschiedene Fachbereiche und Stakeholder miteinander verbindet und kollaborative Lösungsansätze fördert.`;
+  };
+
   const handleSearch = async (searchQuery: string = query) => {
     if (!searchQuery.trim()) return;
     
@@ -157,8 +178,31 @@ export function SearchEngine() {
     }
   };
 
+  const currentSummary = query && results.length > 0 ? generateSummary(query, results) : undefined;
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-secondary/30">
+      {/* Header with Theme Toggle */}
+      <div className="sticky top-0 z-50 border-b border-search-border bg-background/80 backdrop-blur-md">
+        <div className="max-w-7xl mx-auto px-6 py-3">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Brain className="h-6 w-6 text-search-primary" />
+              <span className="font-semibold text-lg">Intelligente Suche</span>
+            </div>
+            
+            <div className="flex items-center gap-3">
+              <ExportDropdown 
+                query={query} 
+                results={results} 
+                summary={currentSummary}
+              />
+              <ThemeToggle />
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Hero Section */}
       <div className="relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-r from-search-primary/5 via-search-accent/5 to-search-primary/5" />
@@ -272,24 +316,11 @@ export function SearchEngine() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                {results.length > 0 ? (
+                {results.length > 0 && currentSummary ? (
                   <div className="space-y-4">
                     <div className="prose max-w-none">
                       <p className="text-lg leading-relaxed">
-                        Basierend auf den analysierten Quellen zu <strong>"{query}"</strong> zeigen sich folgende Kernpunkte:
-                      </p>
-                      
-                      <ul className="space-y-2 mt-4">
-                        <li>• <strong>Aktuelle Entwicklungen:</strong> Die Forschung in diesem Bereich entwickelt sich rapide weiter</li>
-                        <li>• <strong>Praktische Anwendungen:</strong> Vielfältige Einsatzmöglichkeiten in verschiedenen Bereichen</li>
-                        <li>• <strong>Zukunftsperspektiven:</strong> Positive Trends und innovative Ansätze zeichnen sich ab</li>
-                        <li>• <strong>Herausforderungen:</strong> Wichtige Aspekte erfordern weitere Aufmerksamkeit</li>
-                        <li>• <strong>Expertenmeinungen:</strong> Konsens über die Bedeutung des Themas</li>
-                      </ul>
-                      
-                      <p className="mt-4">
-                        Die gefundenen Quellen bieten eine ausgewogene Perspektive auf das Thema und 
-                        stammen aus vertrauenswürdigen wissenschaftlichen und technischen Publikationen.
+                        {currentSummary}
                       </p>
                     </div>
                     
