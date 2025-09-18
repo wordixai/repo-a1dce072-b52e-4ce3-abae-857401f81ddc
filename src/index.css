@@ -9,10 +9,121 @@ The @apply directive should not be used with the group utility class.
 
 @layer base {
   :root {
-   
+    --background: 220 15% 98%;
+    --foreground: 220 13% 9%;
+    --card: 0 0% 100%;
+    --card-foreground: 220 13% 9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 220 13% 9%;
+    --primary: 220 83% 53%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 220 14% 96%;
+    --secondary-foreground: 220 13% 9%;
+    --muted: 220 14% 96%;
+    --muted-foreground: 220 9% 46%;
+    --accent: 220 14% 96%;
+    --accent-foreground: 220 13% 9%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 220 13% 91%;
+    --input: 220 13% 91%;
+    --ring: 220 83% 53%;
+    --radius: 0.5rem;
+    
+    /* Search specific tokens */
+    --search-primary: 220 83% 53%;
+    --search-primary-hover: 220 83% 45%;
+    --search-accent: 142 76% 36%;
+    --search-muted: 220 14% 96%;
+    --search-border: 220 13% 91%;
+    --search-gradient: linear-gradient(135deg, hsl(220 83% 53%) 0%, hsl(142 76% 36%) 100%);
+    --search-glow: 0 0 20px hsla(220 83% 53% / 0.15);
   }
 
   .dark {
+    --background: 220 13% 9%;
+    --foreground: 220 15% 98%;
+    --card: 220 13% 11%;
+    --card-foreground: 220 15% 98%;
+    --popover: 220 13% 11%;
+    --popover-foreground: 220 15% 98%;
+    --primary: 220 83% 53%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 220 13% 15%;
+    --secondary-foreground: 220 15% 98%;
+    --muted: 220 13% 15%;
+    --muted-foreground: 220 9% 64%;
+    --accent: 220 13% 15%;
+    --accent-foreground: 220 15% 98%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 220 13% 19%;
+    --input: 220 13% 19%;
+    --ring: 220 83% 53%;
+    
+    /* Search specific tokens - dark mode */
+    --search-primary: 220 83% 58%;
+    --search-primary-hover: 220 83% 65%;
+    --search-accent: 142 76% 45%;
+    --search-muted: 220 13% 15%;
+    --search-border: 220 13% 19%;
+    --search-gradient: linear-gradient(135deg, hsl(220 83% 58%) 0%, hsl(142 76% 45%) 100%);
+    --search-glow: 0 0 25px hsla(220 83% 58% / 0.2);
+  }
+  
+  * {
+    border-color: hsl(var(--border));
+  }
+  
+  body {
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+}
 
+@layer components {
+  .search-container {
+    background: var(--search-gradient);
+    box-shadow: var(--search-glow);
+  }
+  
+  .search-input {
+    @apply border-2 border-transparent bg-white/95 backdrop-blur-sm focus:border-search-primary focus:shadow-lg transition-all duration-300;
+  }
+  
+  .search-button {
+    @apply bg-search-primary hover:bg-search-primary-hover text-white shadow-lg hover:shadow-xl transition-all duration-300;
+  }
+  
+  .result-card {
+    @apply bg-card border border-search-border rounded-lg p-6 hover:shadow-lg transition-all duration-300 hover:border-search-primary/30;
+  }
+  
+  .source-badge {
+    @apply bg-search-accent/10 text-search-accent border border-search-accent/20 rounded-full px-3 py-1 text-sm font-medium;
+  }
+  
+  .chat-message {
+    @apply rounded-lg p-4 max-w-3xl;
+  }
+  
+  .chat-user {
+    @apply bg-search-primary text-white ml-auto;
+  }
+  
+  .chat-ai {
+    @apply bg-search-muted border border-search-border;
+  }
+  
+  .gradient-text {
+    background: var(--search-gradient);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  
+  .glass-effect {
+    @apply bg-white/80 backdrop-blur-md border border-white/20;
   }
 }
