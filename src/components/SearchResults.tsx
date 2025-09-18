@@ -19,9 +19,11 @@ interface SearchResultsProps {
   results: SearchResult[];
   isLoading: boolean;
   onSourceClick: (url: string) => void;
+  onLoadMore?: () => void;
+  hasMoreResults?: boolean;
 }
 
-export function SearchResults({ results, isLoading, onSourceClick }: SearchResultsProps) {
+export function SearchResults({ results, isLoading, onSourceClick, onLoadMore, hasMoreResults = true }: SearchResultsProps) {
   const formatDate = (timestamp: string) => {
     return new Date(timestamp).toLocaleDateString('de-DE', {
       year: 'numeric',
@@ -168,9 +170,14 @@ export function SearchResults({ results, isLoading, onSourceClick }: SearchResul
       </div>
       
       {/* Load More Button */}
-      {results.length > 0 && (
+      {results.length > 0 && hasMoreResults && onLoadMore && (
         <div className="text-center pt-8">
-          <Button variant="outline" size="lg" className="px-8">
+          <Button 
+            variant="outline" 
+            size="lg" 
+            className="px-8"
+            onClick={onLoadMore}
+          >
             Weitere Ergebnisse laden
           </Button>
         </div>

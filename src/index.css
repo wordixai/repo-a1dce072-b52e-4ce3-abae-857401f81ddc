@@ -89,7 +89,11 @@ The @apply directive should not be used with the group utility class.
   }
   
   .search-input {
-    @apply border-2 border-transparent bg-white/95 backdrop-blur-sm focus:border-search-primary focus:shadow-lg transition-all duration-300;
+    color: hsl(var(--foreground)) !important;
+  }
+  
+  .search-input::placeholder {
+    color: hsl(var(--muted-foreground)) !important;
   }
   
   .search-button {

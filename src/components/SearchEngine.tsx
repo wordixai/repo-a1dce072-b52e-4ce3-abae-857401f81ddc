@@ -10,6 +10,7 @@ import { ExportDropdown } from '@/components/ExportDropdown';
 import { SearchResults } from './SearchResults';
 import { ChatInterface } from './ChatInterface';
 import { ResearchPanel } from './ResearchPanel';
+import { useToast } from '@/hooks/use-toast';
 
 interface SearchResult {
   id: string;
@@ -26,115 +27,63 @@ export function SearchEngine() {
   const [isSearching, setIsSearching] = useState(false);
   const [results, setResults] = useState<SearchResult[]>([]);
   const [activeTab, setActiveTab] = useState('search');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const { toast } = useToast();
 
   // Erweiterte Mock-Daten für verschiedene Suchthemen
-  const generateMockResults = (searchQuery: string): SearchResult[] => {
+  const generateMockResults = (searchQuery: string, page: number = 1): SearchResult[] => {
     const baseResults = [
       {
-        id: '1',
+        id: `${page}-1`,
         title: `${searchQuery} - Umfassende Analyse und Einblicke`,
         url: `https://example.com/${searchQuery.replace(/\s+/g, '-').toLowerCase()}`,
         snippet: `Eine detaillierte Untersuchung von ${searchQuery} mit aktuellen Erkenntnissen und praktischen Anwendungen. Diese Quelle bietet fundierte Informationen und Expertenmeinungen zu den wichtigsten Aspekten des Themas.`,
         source: 'ExpertBlog',
-        relevance: 0.95,
+        relevance: 0.95 - (page - 1) * 0.05,
         timestamp: new Date(Date.now() - Math.random() * 7 * 24 * 60 * 60 * 1000).toISOString()
       },
       {
-        id: '2',
-        title: `Neueste Entwicklungen in ${searchQuery}`,
-        url: `https://research.example.com/${searchQuery.replace(/\s+/g, '-').toLowerCase()}`,
+        id: `${page}-2`,
+        title: `Neueste Entwicklungen in ${searchQuery} - Seite ${page}`,
+        url: `https://research.example.com/${searchQuery.replace(/\s+/g, '-').toLowerCase()}-${page}`,
         snippet: `Aktuelle Forschungsergebnisse und Trends zu ${searchQuery}. Diese wissenschaftliche Publikation beleuchtet die neuesten Fortschritte und zukünftige Perspektiven in diesem Bereich.`,
         source: 'Forschungsjournal',
-        relevance: 0.92,
+        relevance: 0.92 - (page - 1) * 0.05,
         timestamp: new Date(Date.now() - Math.random() * 14 * 24 * 60 * 60 * 1000).toISOString()
       },
       {
-        id: '3',
-        title: `Praktische Anwendungen von ${searchQuery}`,
-        url: `https://tech.example.com/${searchQuery.replace(/\s+/g, '-').toLowerCase()}`,
+        id: `${page}-3`,
+        title: `Praktische Anwendungen von ${searchQuery} - Teil ${page}`,
+        url: `https://tech.example.com/${searchQuery.replace(/\s+/g, '-').toLowerCase()}-${page}`,
         snippet: `Wie ${searchQuery} in der Praxis eingesetzt wird - von Grundlagen bis zu fortgeschrittenen Techniken. Ein umfassender Leitfaden mit Beispielen und Best Practices.`,
         source: 'TechMagazin',
-        relevance: 0.89,
+        relevance: 0.89 - (page - 1) * 0.05,
         timestamp: new Date(Date.now() - Math.random() * 21 * 24 * 60 * 60 * 1000).toISOString()
       },
       {
-        id: '4',
-        title: `${searchQuery}: Trends und Zukunftsperspektiven`,
-        url: `https://future.example.com/${searchQuery.replace(/\s+/g, '-').toLowerCase()}`,
+        id: `${page}-4`,
+        title: `${searchQuery}: Trends und Zukunftsperspektiven ${page}`,
+        url: `https://future.example.com/${searchQuery.replace(/\s+/g, '-').toLowerCase()}-${page}`,
         snippet: `Eine Analyse der aktuellen Trends und zukünftigen Entwicklungen im Bereich ${searchQuery}. Expertenmeinungen und Prognosen für die kommenden Jahre.`,
         source: 'ZukunftsTrends',
-        relevance: 0.87,
+        relevance: 0.87 - (page - 1) * 0.05,
         timestamp: new Date(Date.now() - Math.random() * 28 * 24 * 60 * 60 * 1000).toISOString()
       },
       {
-        id: '5',
-        title: `Grundlagen und Einführung in ${searchQuery}`,
-        url: `https://learn.example.com/${searchQuery.replace(/\s+/g, '-').toLowerCase()}`,
+        id: `${page}-5`,
+        title: `Grundlagen und Einführung in ${searchQuery} - Band ${page}`,
+        url: `https://learn.example.com/${searchQuery.replace(/\s+/g, '-').toLowerCase()}-${page}`,
         snippet: `Ein umfassender Einführungskurs zu ${searchQuery} für Anfänger und Fortgeschrittene. Schritt-für-Schritt Anleitungen und verständliche Erklärungen der wichtigsten Konzepte.`,
         source: 'LernPlattform',
-        relevance: 0.84,
+        relevance: 0.84 - (page - 1) * 0.05,
         timestamp: new Date(Date.now() - Math.random() * 35 * 24 * 60 * 60 * 1000).toISOString()
       }
     ];
 
-    // Spezifische Ergebnisse für häufige Suchbegriffe
-    const specificResults: { [key: string]: SearchResult[] } = {
-      'künstliche intelligenz': [
-        {
-          id: 'ai1',
-          title: 'KI revolutioniert die Suchmaschinenoptimierung',
-          url: 'https://example.com/ai-seo',
-          snippet: 'Machine Learning Algorithmen analysieren Nutzerverhalten und Kontext für präzisere Suchergebnisse. Diese Entwicklung verändert grundlegend, wie wir Informationen finden.',
-          source: 'AI Research',
-          relevance: 0.96,
-          timestamp: '2024-01-15T10:30:00Z'
-        },
-        {
-          id: 'ai2',
-          title: 'Deep Learning in der Praxis',
-          url: 'https://example.com/deep-learning',
-          snippet: 'Neuronale Netze ermöglichen es Computern, komplexe Muster zu erkennen und menschenähnliche Entscheidungen zu treffen.',
-          source: 'TechBlog',
-          relevance: 0.93,
-          timestamp: '2024-01-14T15:20:00Z'
-        }
-      ],
-      'klimawandel': [
-        {
-          id: 'climate1',
-          title: 'Aktuelle Klimadaten und Trends',
-          url: 'https://example.com/climate-data',
-          snippet: 'Neueste wissenschaftliche Erkenntnisse zum Klimawandel zeigen beschleunigte Veränderungen in globalen Temperaturen und Wettermustern.',
-          source: 'Klimaforschung',
-          relevance: 0.94,
-          timestamp: '2024-01-16T09:15:00Z'
-        }
-      ],
-      'blockchain': [
-        {
-          id: 'crypto1',
-          title: 'Blockchain-Technologie verstehen',
-          url: 'https://example.com/blockchain-basics',
-          snippet: 'Dezentrale Ledger-Technologie revolutioniert Finanzwesen und Datenmanagement durch Transparenz und Sicherheit.',
-          source: 'CryptoJournal',
-          relevance: 0.91,
-          timestamp: '2024-01-13T14:30:00Z'
-        }
-      ]
-    };
-
-    // Prüfe auf spezifische Begriffe
-    const lowerQuery = searchQuery.toLowerCase();
-    for (const [key, specificRes] of Object.entries(specificResults)) {
-      if (lowerQuery.includes(key)) {
-        return [...specificRes, ...baseResults.slice(0, 3)];
-      }
-    }
-
-    // Fallback: Angepasste Basis-Ergebnisse
     return baseResults.map(result => ({
       ...result,
-      relevance: Math.max(0.75, result.relevance - Math.random() * 0.1)
+      relevance: Math.max(0.65, result.relevance)
     }));
   };
 
@@ -161,15 +110,37 @@ export function SearchEngine() {
     if (!searchQuery.trim()) return;
     
     setIsSearching(true);
+    setCurrentPage(1);
     
     // Simulate API call delay
     await new Promise(resolve => setTimeout(resolve, 1200));
     
     // Generiere relevante Ergebnisse
-    const searchResults = generateMockResults(searchQuery);
+    const searchResults = generateMockResults(searchQuery, 1);
     
     setResults(searchResults);
     setIsSearching(false);
+  };
+
+  const handleLoadMore = async () => {
+    if (!query.trim()) return;
+    
+    setIsLoadingMore(true);
+    
+    // Simulate API call delay
+    await new Promise(resolve => setTimeout(resolve, 800));
+    
+    const nextPage = currentPage + 1;
+    const newResults = generateMockResults(query, nextPage);
+    
+    setResults(prev => [...prev, ...newResults]);
+    setCurrentPage(nextPage);
+    setIsLoadingMore(false);
+    
+    toast({
+      title: "Weitere Ergebnisse geladen",
+      description: `${newResults.length} zusätzliche Ergebnisse hinzugefügt.`,
+    });
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -179,6 +150,7 @@ export function SearchEngine() {
   };
 
   const currentSummary = query && results.length > 0 ? generateSummary(query, results) : undefined;
+  const hasMoreResults = currentPage < 5; // Maximal 5 Seiten simulieren
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-secondary/30">
@@ -219,7 +191,7 @@ export function SearchEngine() {
             {/* Search Bar */}
             <div className="relative max-w-2xl mx-auto">
               <div className="search-container rounded-2xl p-1">
-                <div className="relative flex items-center glass-effect rounded-xl">
+                <div className="relative flex items-center bg-white dark:bg-gray-900 rounded-xl border border-search-border">
                   <Search className="absolute left-4 h-5 w-5 text-muted-foreground" />
                   <Input
                     type="text"
@@ -227,7 +199,7 @@ export function SearchEngine() {
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
                     onKeyPress={handleKeyPress}
-                    className="search-input pl-12 pr-4 py-6 text-lg border-0 bg-transparent"
+                    className="pl-12 pr-4 py-6 text-lg border-0 bg-transparent text-foreground placeholder:text-muted-foreground focus:ring-2 focus:ring-search-primary"
                     disabled={isSearching}
                   />
                   <Button
@@ -291,8 +263,10 @@ export function SearchEngine() {
           <TabsContent value="search">
             <SearchResults 
               results={results} 
-              isLoading={isSearching}
+              isLoading={isSearching || isLoadingMore}
               onSourceClick={(url) => window.open(url, '_blank')}
+              onLoadMore={handleLoadMore}
+              hasMoreResults={hasMoreResults}
             />
           </TabsContent>
 
