@@ -25,54 +25,116 @@ export function SearchEngine() {
   const [results, setResults] = useState<SearchResult[]>([]);
   const [activeTab, setActiveTab] = useState('search');
 
-  // Mock search results for demonstration
-  const mockResults: SearchResult[] = [
-    {
-      id: '1',
-      title: 'Künstliche Intelligenz in der Suchmaschinenoptimierung',
-      url: 'https://example.com/ai-seo',
-      snippet: 'KI revolutioniert die Art, wie Suchmaschinen Inhalte verstehen und bewerten. Machine Learning Algorithmen analysieren Nutzerverhalten und Kontext...',
-      source: 'TechBlog',
-      relevance: 0.95,
-      timestamp: '2024-01-15T10:30:00Z'
-    },
-    {
-      id: '2',
-      title: 'Deep Learning und natürliche Sprachverarbeitung',
-      url: 'https://example.com/nlp-deep-learning',
-      snippet: 'Natural Language Processing ermöglicht es Computern, menschliche Sprache zu verstehen und zu interpretieren. Transformer-Modelle wie GPT haben...',
-      source: 'AI Research',
-      relevance: 0.92,
-      timestamp: '2024-01-14T15:20:00Z'
-    },
-    {
-      id: '3',
-      title: 'Semantische Suche und Vektorräume',
-      url: 'https://example.com/semantic-search',
-      snippet: 'Semantische Suchsysteme verwenden Embedding-Technologien, um die Bedeutung von Begriffen im Kontext zu verstehen...',
-      source: 'Search Technology',
-      relevance: 0.89,
-      timestamp: '2024-01-13T09:45:00Z'
-    },
-    {
-      id: '4',
-      title: 'Multimodale KI-Systeme der Zukunft',
-      url: 'https://example.com/multimodal-ai',
-      snippet: 'Die nächste Generation von KI-Systemen kann Text, Bilder, Audio und Video gleichzeitig verarbeiten und verstehen...',
-      source: 'Future Tech',
-      relevance: 0.87,
-      timestamp: '2024-01-12T14:10:00Z'
-    },
-    {
-      id: '5',
-      title: 'Ethische Aspekte der KI-gestützten Suche',
-      url: 'https://example.com/ai-ethics',
-      snippet: 'Bei der Entwicklung intelligenter Suchsysteme müssen Datenschutz, Fairness und Transparenz berücksichtigt werden...',
-      source: 'Ethics Journal',
-      relevance: 0.84,
-      timestamp: '2024-01-11T11:25:00Z'
+  // Erweiterte Mock-Daten für verschiedene Suchthemen
+  const generateMockResults = (searchQuery: string): SearchResult[] => {
+    const baseResults = [
+      {
+        id: '1',
+        title: `${searchQuery} - Umfassende Analyse und Einblicke`,
+        url: `https://example.com/${searchQuery.replace(/\s+/g, '-').toLowerCase()}`,
+        snippet: `Eine detaillierte Untersuchung von ${searchQuery} mit aktuellen Erkenntnissen und praktischen Anwendungen. Diese Quelle bietet fundierte Informationen und Expertenmeinungen zu den wichtigsten Aspekten des Themas.`,
+        source: 'ExpertBlog',
+        relevance: 0.95,
+        timestamp: new Date(Date.now() - Math.random() * 7 * 24 * 60 * 60 * 1000).toISOString()
+      },
+      {
+        id: '2',
+        title: `Neueste Entwicklungen in ${searchQuery}`,
+        url: `https://research.example.com/${searchQuery.replace(/\s+/g, '-').toLowerCase()}`,
+        snippet: `Aktuelle Forschungsergebnisse und Trends zu ${searchQuery}. Diese wissenschaftliche Publikation beleuchtet die neuesten Fortschritte und zukünftige Perspektiven in diesem Bereich.`,
+        source: 'Forschungsjournal',
+        relevance: 0.92,
+        timestamp: new Date(Date.now() - Math.random() * 14 * 24 * 60 * 60 * 1000).toISOString()
+      },
+      {
+        id: '3',
+        title: `Praktische Anwendungen von ${searchQuery}`,
+        url: `https://tech.example.com/${searchQuery.replace(/\s+/g, '-').toLowerCase()}`,
+        snippet: `Wie ${searchQuery} in der Praxis eingesetzt wird - von Grundlagen bis zu fortgeschrittenen Techniken. Ein umfassender Leitfaden mit Beispielen und Best Practices.`,
+        source: 'TechMagazin',
+        relevance: 0.89,
+        timestamp: new Date(Date.now() - Math.random() * 21 * 24 * 60 * 60 * 1000).toISOString()
+      },
+      {
+        id: '4',
+        title: `${searchQuery}: Trends und Zukunftsperspektiven`,
+        url: `https://future.example.com/${searchQuery.replace(/\s+/g, '-').toLowerCase()}`,
+        snippet: `Eine Analyse der aktuellen Trends und zukünftigen Entwicklungen im Bereich ${searchQuery}. Expertenmeinungen und Prognosen für die kommenden Jahre.`,
+        source: 'ZukunftsTrends',
+        relevance: 0.87,
+        timestamp: new Date(Date.now() - Math.random() * 28 * 24 * 60 * 60 * 1000).toISOString()
+      },
+      {
+        id: '5',
+        title: `Grundlagen und Einführung in ${searchQuery}`,
+        url: `https://learn.example.com/${searchQuery.replace(/\s+/g, '-').toLowerCase()}`,
+        snippet: `Ein umfassender Einführungskurs zu ${searchQuery} für Anfänger und Fortgeschrittene. Schritt-für-Schritt Anleitungen und verständliche Erklärungen der wichtigsten Konzepte.`,
+        source: 'LernPlattform',
+        relevance: 0.84,
+        timestamp: new Date(Date.now() - Math.random() * 35 * 24 * 60 * 60 * 1000).toISOString()
+      }
+    ];
+
+    // Spezifische Ergebnisse für häufige Suchbegriffe
+    const specificResults: { [key: string]: SearchResult[] } = {
+      'künstliche intelligenz': [
+        {
+          id: 'ai1',
+          title: 'KI revolutioniert die Suchmaschinenoptimierung',
+          url: 'https://example.com/ai-seo',
+          snippet: 'Machine Learning Algorithmen analysieren Nutzerverhalten und Kontext für präzisere Suchergebnisse. Diese Entwicklung verändert grundlegend, wie wir Informationen finden.',
+          source: 'AI Research',
+          relevance: 0.96,
+          timestamp: '2024-01-15T10:30:00Z'
+        },
+        {
+          id: 'ai2',
+          title: 'Deep Learning in der Praxis',
+          url: 'https://example.com/deep-learning',
+          snippet: 'Neuronale Netze ermöglichen es Computern, komplexe Muster zu erkennen und menschenähnliche Entscheidungen zu treffen.',
+          source: 'TechBlog',
+          relevance: 0.93,
+          timestamp: '2024-01-14T15:20:00Z'
+        }
+      ],
+      'klimawandel': [
+        {
+          id: 'climate1',
+          title: 'Aktuelle Klimadaten und Trends',
+          url: 'https://example.com/climate-data',
+          snippet: 'Neueste wissenschaftliche Erkenntnisse zum Klimawandel zeigen beschleunigte Veränderungen in globalen Temperaturen und Wettermustern.',
+          source: 'Klimaforschung',
+          relevance: 0.94,
+          timestamp: '2024-01-16T09:15:00Z'
+        }
+      ],
+      'blockchain': [
+        {
+          id: 'crypto1',
+          title: 'Blockchain-Technologie verstehen',
+          url: 'https://example.com/blockchain-basics',
+          snippet: 'Dezentrale Ledger-Technologie revolutioniert Finanzwesen und Datenmanagement durch Transparenz und Sicherheit.',
+          source: 'CryptoJournal',
+          relevance: 0.91,
+          timestamp: '2024-01-13T14:30:00Z'
+        }
+      ]
+    };
+
+    // Prüfe auf spezifische Begriffe
+    const lowerQuery = searchQuery.toLowerCase();
+    for (const [key, specificRes] of Object.entries(specificResults)) {
+      if (lowerQuery.includes(key)) {
+        return [...specificRes, ...baseResults.slice(0, 3)];
+      }
     }
-  ];
+
+    // Fallback: Angepasste Basis-Ergebnisse
+    return baseResults.map(result => ({
+      ...result,
+      relevance: Math.max(0.75, result.relevance - Math.random() * 0.1)
+    }));
+  };
 
   const handleSearch = async (searchQuery: string = query) => {
     if (!searchQuery.trim()) return;
@@ -80,15 +142,12 @@ export function SearchEngine() {
     setIsSearching(true);
     
     // Simulate API call delay
-    await new Promise(resolve => setTimeout(resolve, 1500));
+    await new Promise(resolve => setTimeout(resolve, 1200));
     
-    // Filter and sort mock results based on query
-    const filteredResults = mockResults.filter(result => 
-      result.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      result.snippet.toLowerCase().includes(searchQuery.toLowerCase())
-    ).sort((a, b) => b.relevance - a.relevance);
+    // Generiere relevante Ergebnisse
+    const searchResults = generateMockResults(searchQuery);
     
-    setResults(filteredResults);
+    setResults(searchResults);
     setIsSearching(false);
   };
 
@@ -140,6 +199,24 @@ export function SearchEngine() {
                   </Button>
                 </div>
               </div>
+            </div>
+            
+            {/* Quick Search Suggestions */}
+            <div className="flex flex-wrap justify-center gap-2 mt-6">
+              {['Künstliche Intelligenz', 'Klimawandel', 'Blockchain', 'Nachhaltigkeit', 'Digitalisierung'].map((suggestion) => (
+                <Button
+                  key={suggestion}
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    setQuery(suggestion);
+                    handleSearch(suggestion);
+                  }}
+                  className="text-sm"
+                >
+                  {suggestion}
+                </Button>
+              ))}
             </div>
           </div>
         </div>
@@ -199,21 +276,25 @@ export function SearchEngine() {
                   <div className="space-y-4">
                     <div className="prose max-w-none">
                       <p className="text-lg leading-relaxed">
-                        Basierend auf den analysierten Quellen zeigt sich, dass <strong>Künstliche Intelligenz</strong> 
-                        die Suchmaschinenlandschaft grundlegend transformiert. Die wichtigsten Erkenntnisse:
+                        Basierend auf den analysierten Quellen zu <strong>"{query}"</strong> zeigen sich folgende Kernpunkte:
                       </p>
                       
                       <ul className="space-y-2 mt-4">
-                        <li>• <strong>Machine Learning Algorithmen</strong> ermöglichen ein tieferes Verständnis von Nutzerverhalten und Kontext</li>
-                        <li>• <strong>Natural Language Processing</strong> verbessert die Interpretation menschlicher Sprache erheblich</li>
-                        <li>• <strong>Semantische Suche</strong> nutzt Embedding-Technologien für kontextuelle Bedeutung</li>
-                        <li>• <strong>Multimodale Systeme</strong> können verschiedene Medientypen gleichzeitig verarbeiten</li>
-                        <li>• <strong>Ethische Überlegungen</strong> zu Datenschutz und Fairness werden immer wichtiger</li>
+                        <li>• <strong>Aktuelle Entwicklungen:</strong> Die Forschung in diesem Bereich entwickelt sich rapide weiter</li>
+                        <li>• <strong>Praktische Anwendungen:</strong> Vielfältige Einsatzmöglichkeiten in verschiedenen Bereichen</li>
+                        <li>• <strong>Zukunftsperspektiven:</strong> Positive Trends und innovative Ansätze zeichnen sich ab</li>
+                        <li>• <strong>Herausforderungen:</strong> Wichtige Aspekte erfordern weitere Aufmerksamkeit</li>
+                        <li>• <strong>Expertenmeinungen:</strong> Konsens über die Bedeutung des Themas</li>
                       </ul>
+                      
+                      <p className="mt-4">
+                        Die gefundenen Quellen bieten eine ausgewogene Perspektive auf das Thema und 
+                        stammen aus vertrauenswürdigen wissenschaftlichen und technischen Publikationen.
+                      </p>
                     </div>
                     
                     <div className="flex flex-wrap gap-2 mt-6">
-                      <Badge variant="outline">Vertrauenswürdigkeit: 94%</Badge>
+                      <Badge variant="outline">Vertrauenswürdigkeit: {Math.round(results.reduce((acc, r) => acc + r.relevance, 0) / results.length * 100)}%</Badge>
                       <Badge variant="outline">{results.length} Quellen analysiert</Badge>
                       <Badge variant="outline">Aktualisiert: {new Date().toLocaleDateString('de-DE')}</Badge>
                     </div>
